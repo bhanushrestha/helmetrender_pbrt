@@ -14,9 +14,7 @@ https://visualstudio.microsoft.com/vs/older-downloads/
 4. (recommended) get Visual Studio Code from https://code.visualstudio.com/
 5. Download the PBRT repository using GIT
 PBRT repository on github: https://github.com/mmp/pbrt-v3
-a. Create a directory where you want the 
-
-### PBRT installation
+a. Create a directory where you want the PBRT installation
 b. From this directory, open GIT Bash (you can do this by right click -> “git bash
 here”)
 c. Type the following command in the GIT console
@@ -24,7 +22,8 @@ git clone --recursive https://github.com/mmp/pbrt-v3.git
 d. Do not download the PBRT repository from the web as zip. Make sure to
 download the PBRT repository using git recursive, this ensures that all sub
 modules are downloaded properly.
-Installing PBRT:
+
+### Installing PBRT:
 6. Create a folder named “build” inside your PBRT-V3 directory.
 7. Open cmake-gui, set the source folder (“Where is the source code”) to your PBRT-
 V3 directory
