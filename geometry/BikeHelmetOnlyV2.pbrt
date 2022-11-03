@@ -1,9 +1,6 @@
 # Converted from ".\BikeHelmetOnlyV2.obj" by obj2pbrt
 # Scene bounds: (-20.106701, -16.532305, -0.055900) - (20.091600, 16.532297, 40.304001)
 
-
-MakeNamedMaterial "10517_Motorcycle_Helmet_v01" "string type" "uber" "color Kd" [0.800000 0.800000 0.800000] "color Ks" [0.000000 0.000000 0.000000] "float roughness" [0.000000] "rgb Kt" [0.000000 0.000000 0.000000] "float index" [1.450000] "rgb opacity" [1.000000 1.000000 1.000000] 
-
 # Name "10517_Motorcycle_Helmet_v01_L3.001"
 AttributeBegin
 NamedMaterial "10517_Motorcycle_Helmet_v01"

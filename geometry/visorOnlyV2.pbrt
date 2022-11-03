@@ -1,9 +1,6 @@
 # Converted from ".\visorOnlyV2.obj" by obj2pbrt
 # Scene bounds: (-19.601700, -16.771503, 11.970499) - (6.068600, 16.771496, 28.724401)
 
-
-MakeNamedMaterial "10517_Motorcycle_Helmet_v01_glass" "string type" "uber" "color Kd" [0.800000 0.800000 0.800000] "color Ks" [0.000000 0.000000 0.000000] "float roughness" [0.000000] "rgb Kt" [0.000000 0.000000 0.000000] "float index" [1.450000] "rgb opacity" [1.000000 1.000000 1.000000] 
-
 # Name "10517_Motorcycle_Helmet_v01_L3"
 AttributeBegin
 NamedMaterial "10517_Motorcycle_Helmet_v01_glass"

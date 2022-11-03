@@ -1,7 +1,7 @@
 LookAt 100 0 0   0 0 0    0 0 1
 
 # Camera "perspective" "float fov" [90]
-Camera "perspective" "float fov" [90] "float lensradius" [1] "float focaldistance" [40] 
+Camera "perspective" "float fov" [90] "float lensradius" [0.5] "float focaldistance" [40] 
  
 Film "image" "integer xresolution" [1000] "integer yresolution" [500]
      "string filename" "renderExperiment.png"
@@ -43,51 +43,56 @@ AttributeEnd
 #   Shape "sphere" "float radius" 10 #sphere in the origin
 # AttributeEnd
 
+# V2 Objects
+
 #Helmet Object
 AttributeBegin
-  Translate 40 -10 -25
+  Translate 60 0 -15
   Scale 1 1 1
   #Rotate 0 0 0 1
   #Rotate 180 0 1 0
   Rotate 180 0 0 1
   Rotate 0 1 0 0
   NamedMaterial "Mirror1"
-  Include "visorOnlyV2.pbrt"
+  Include "geometry/visorOnlyV2.pbrt"
 AttributeEnd
 
 #Helmet Object 2
 AttributeBegin
-  Translate 40 -10 -25
+  Translate 60 0 -15
   Scale 1 1 1
   #Rotate 0 0 0 1
   #Rotate 180 0 1 0
   Rotate 180 0 0 1
   Rotate 0 1 0 0
   NamedMaterial "mattePurple"
-  Include "bikeHelmetOnlyV2.pbrt"
+  Include "geometry/bikeHelmetOnlyV2.pbrt"
 AttributeEnd
 
+## v1 Objects
 
 # #Helmet Object
 # AttributeBegin
-#   Translate 40 -12 -25
+#   Translate 40 -14 -8
 #   Scale 1 1 1
 #   #Rotate 0 0 0 1
 #   #Rotate 180 0 1 0
 #   Rotate 0 0 0 1
 #   Rotate 90 1 0 0
+#   Rotate -20 0 0 1
 #   NamedMaterial "Mirror1"
 #   Include "visorOnly.pbrt"
 # AttributeEnd
 
 # #Helmet Object 2
 # AttributeBegin
-#   Translate 62 -5 -25
+#   Translate 62 -5 -15
 #   Scale 1 1 1
 #   #Rotate 0 0 0 1
 #   #Rotate 180 0 1 0
 #   Rotate 0 0 0 1
 #   Rotate 90 1 0 0
+#   Rotate -20 0 0 1
 #   NamedMaterial "mattePurple"
 #   Include "bikeHelmetOnly.pbrt"
 # AttributeEnd
