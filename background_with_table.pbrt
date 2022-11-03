@@ -16,6 +16,11 @@ WorldBegin
 MakeNamedMaterial "Mirror1"
 	"color Kr" [0.73565960 0.73565960 0.73565960]
 	"string type" ["mirror"]
+  
+## Matte Green
+MakeNamedMaterial "mattePurple"
+        "string type" [ "matte" ]  #material type: matte
+	"rgb Kd" [ 0.7 0.5 0.7 ]         #Purple
 
 ## Light ##################################################################################################################################
 AttributeBegin
@@ -24,16 +29,41 @@ AttributeBegin
   LightSource "infinite"  "string mapname" ["images/background1.exr"]
 AttributeEnd
 
+# #Helmet Object
+# AttributeBegin
+#   Translate 41.5 0 -10
+#   Scale 1.5 1.5 1.5
+#   #Rotate 0 0 0 1
+#   #Rotate 180 0 1 0
+#   Rotate 180 0 0 1
+#   Rotate 0 1 0 0
+#   NamedMaterial "Mirror1"
+#   Include "helmet_v01_l3.pbrt"
+# AttributeEnd
+
+
 #Helmet Object
 AttributeBegin
-  Translate 41.5 0 -10
-  Scale 1.5 1.5 1.5
+  Translate 60 0 -15
+  Scale 1 1 1
   #Rotate 0 0 0 1
   #Rotate 180 0 1 0
   Rotate 180 0 0 1
   Rotate 0 1 0 0
   NamedMaterial "Mirror1"
-  Include "helmet_v01_l3.pbrt"
+  Include "geometry/visorOnlyV2.pbrt"
+AttributeEnd
+
+#Helmet Object 2
+AttributeBegin
+  Translate 60 0 -15
+  Scale 1 1 1
+  #Rotate 0 0 0 1
+  #Rotate 180 0 1 0
+  Rotate 180 0 0 1
+  Rotate 0 1 0 0
+  NamedMaterial "mattePurple"
+  Include "geometry/bikeHelmetOnlyV2.pbrt"
 AttributeEnd
 
 # Disk
