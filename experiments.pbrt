@@ -1,0 +1,106 @@
+LookAt 100 0 0   0 0 0    0 0 1
+
+# Camera "perspective" "float fov" [90]
+Camera "perspective" "float fov" [90] "float lensradius" [1] "float focaldistance" [40] 
+ 
+Film "image" "integer xresolution" [1000] "integer yresolution" [500]
+     "string filename" "renderExperiment.png"
+
+Sampler "halton" "integer pixelsamples" [12] #[128]
+
+Integrator "path"   "integer maxdepth" [10]
+
+
+
+WorldBegin
+
+## Mirror Material
+MakeNamedMaterial "Mirror1"
+	"color Kr" [0.73565960 0.73565960 0.73565960]
+	"string type" ["mirror"]
+
+## Matte Green
+MakeNamedMaterial "mattePurple"
+        "string type" [ "matte" ]  #material type: matte
+	"rgb Kd" [ 0.7 0.5 0.7 ]         #Purple
+
+## Light ##################################################################################################################################
+AttributeBegin
+  Rotate 180 0 0 1
+  Translate 0 0 -50
+  #LightSource "infinite"  "string mapname" ["textures/doge2_latlong.exr"] 
+  LightSource "infinite"  "string mapname" ["images/background1.exr"] 
+AttributeEnd
+
+#R0010063.jpg
+################################
+#SPHERE 1:
+################################
+# AttributeBegin
+#   #NamedMaterial "Ruby"
+#   NamedMaterial "Mirror1"
+#   Translate 0 0 -50
+#   Shape "sphere" "float radius" 10 #sphere in the origin
+# AttributeEnd
+
+#Helmet Object
+AttributeBegin
+  Translate 40 -10 -25
+  Scale 1 1 1
+  #Rotate 0 0 0 1
+  #Rotate 180 0 1 0
+  Rotate 180 0 0 1
+  Rotate 0 1 0 0
+  NamedMaterial "Mirror1"
+  Include "visorOnlyV2.pbrt"
+AttributeEnd
+
+#Helmet Object 2
+AttributeBegin
+  Translate 40 -10 -25
+  Scale 1 1 1
+  #Rotate 0 0 0 1
+  #Rotate 180 0 1 0
+  Rotate 180 0 0 1
+  Rotate 0 1 0 0
+  NamedMaterial "mattePurple"
+  Include "bikeHelmetOnlyV2.pbrt"
+AttributeEnd
+
+
+# #Helmet Object
+# AttributeBegin
+#   Translate 40 -12 -25
+#   Scale 1 1 1
+#   #Rotate 0 0 0 1
+#   #Rotate 180 0 1 0
+#   Rotate 0 0 0 1
+#   Rotate 90 1 0 0
+#   NamedMaterial "Mirror1"
+#   Include "visorOnly.pbrt"
+# AttributeEnd
+
+# #Helmet Object 2
+# AttributeBegin
+#   Translate 62 -5 -25
+#   Scale 1 1 1
+#   #Rotate 0 0 0 1
+#   #Rotate 180 0 1 0
+#   Rotate 0 0 0 1
+#   Rotate 90 1 0 0
+#   NamedMaterial "mattePurple"
+#   Include "bikeHelmetOnly.pbrt"
+# AttributeEnd
+
+#Helmet Object 2
+# AttributeBegin
+#   Translate 0 -40 0
+#   Scale 1.5 1.5 1.5
+#   Rotate 0 0 0 1
+#   Rotate 180 0 1 0
+#   Rotate 0 1 0 0
+#   NamedMaterial "mattePurple"
+#   Include "helmet_v01_l3.pbrt"
+# AttributeEnd
+
+WorldEnd

@@ -1,0 +1,4 @@
+watchexec -w background.pbrt ..\..\build\Release\pbrt.exe background.pbrt
+
+
+..\..\build\Release\obj2pbrt.exe .\10517_Motorcycle_Helmet_v01_L3.obj helmet_v01_l3.pbrt
