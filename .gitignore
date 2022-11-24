@@ -1,0 +1,25 @@
+build/
+.cache/
+compile_commands.json
+*.png
+
+# Visual Studio
+*.sln
+*.vcxproj
+*.filters
+*.tlog
+*.log
+*.recipe
+
+#Cmake files
+CMakeFiles/
+CPackConfig.cmake
+CPackSourceConfig.cmake
+CMakeCache.txt
+cmake_install.cmake
+
+# Compile artifacts
+*.exe
+*.pdb
+*.obj
+*.ilk
