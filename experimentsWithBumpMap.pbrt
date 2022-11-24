@@ -1,0 +1,205 @@
+LookAt 100 0 0   0 0 0    0 0 1
+
+# Camera "perspective" "float fov" [90]
+Camera "perspective" "float fov" [90] "float lensradius" [0.5] "float focaldistance" [40] 
+ 
+Film "image" "integer xresolution" [1000] "integer yresolution" [500]
+     "string filename" "renderExperiments.png"
+
+Sampler "halton" "integer pixelsamples" [50] #[128]
+
+Integrator "path"   "integer maxdepth" [10]
+
+
+
+WorldBegin
+
+## Mirror Material
+MakeNamedMaterial "Mirror1"
+	"color Kr" [0.73565960 0.73565960 0.73565960]
+  "string type" ["mirror"]
+
+## Glass Material
+MakeNamedMaterial "Glass1"
+  "color Kr" [1 1 1]
+  "float uroughness" [0.8]
+  "float vroughness" [0.8]
+  "float eta" [0.8]
+  "spectrum Kr" [0 1]
+  "string type" ["glass"]
+
+MakeNamedMaterial "GlassMirror"
+  "spectrum texture amount" [0]
+  "string namedmaterial1" ["Mirror1"]
+  "string namedmaterial2" ["Glass1"]
+  "string type" ["mix"]
+
+## Mirror Material
+MakeNamedMaterial "Uber1"
+	"color Kr" [0.7 0.5 0.7]
+	"string type" ["uber"]
+
+Texture "SP_LUK" "color" "imagemap" "string filename" ["textures/sponza/sp_luk.exr"]
+Texture "SP_LUK-scale" "color" "scale" "texture tex1" "SP_LUK" "color tex2" [.8 .8 .8]
+Texture "SP_LUK-bump" "float" "imagemap" "string filename" ["textures/sponza/sp_luk.exr"]
+Texture "SP_LUK-bump-scale" "float" "scale" "texture tex1" "SP_LUK-bump" "float tex2" [.1]
+
+## Mirror Material
+MakeNamedMaterial "Uber2"
+	"color opacity" [1 1 1]
+  "color ks" [0.7 0.6 0.7]
+  "float roughness" [0.500000]
+  "texture Kd" "SP_LUK-scale"
+  "texture bumpmap" "SP_LUK-bump-scale"
+	"string type" ["uber"]
+# Material "uber" "texture Kd" "SP_LUK-scale" "color opacity" [1.000000 1.000000 1.000000] "color Ks" [0.000000 0.000000 0.000000] "float roughness" [0.500000] 
+# "texture bumpmap" "SP_LUK-bump-scale"
+
+Texture "mitra_inlay-kd-tex" "color" "imagemap" 
+        "string filename" [ "textures/mitra/mitra_border_color.png" ] 
+Texture "mitra_inlay-kd" "color" "scale"
+        "texture tex1" "mitra_inlay-kd-tex"
+        "rgb tex2" [1.5 1.5 1.5]
+Texture "mitra_inlay-bump" "float" "imagemap" 
+        "string filename" [ "textures/mitra/mitra_border_bump.png" ] 
+Texture "mitra_inlay-bump-sc" "float" "scale"
+        "texture tex1" "mitra_inlay-bump" "float tex2" .9
+MakeNamedMaterial "mitra_inlay" 
+        "float roughness" [ 0.0104080001 ] 
+        "float index" [ 1 ] 
+        "string type" [ "uber" ] 
+        "texture Kd" [ "mitra_inlay-kd" ] 
+        "rgb Ks" [ 0.310160011 0.310160011 0.310160011 ] 
+        "texture bumpmap" "mitra_inlay-bump-sc"
+
+#Bumpy Texture Images
+Texture "bumpy_inlay-kd-tex" "color" "imagemap" 
+        "string filename" [ "textures/wallTexture.png" ] 
+Texture "bumpy_inlay-kd" "color" "scale"
+        "texture tex1" "bumpy_inlay-kd-tex"
+        "rgb tex2" [1.5 1.5 1.5]
+Texture "bumpy_inlay-bump" "float" "imagemap" 
+        "string filename" [ "textures/helmetTexture2.png" ] 
+Texture "bumpy_inlay-bump-sc" "float" "scale"
+        "texture tex1" "bumpy_inlay-bump" "float tex2" 0.005
+        #"texture tex1" "bumpy_inlay-bump" "texture tex2" "bumpy_inlay-bump"
+MakeNamedMaterial "bumpy_inlay" 
+        "float roughness" [ 0.0104080001 ] 
+        "float index" [ 1 ] 
+        "string type" [ "uber" ] 
+        "texture Kd" [ "bumpy_inlay-kd" ] 
+        "rgb Ks" [ 0.310160011 0.310160011 0.310160011 ] 
+        "texture bumpmap" "bumpy_inlay-bump-sc"
+
+## Matte Green
+MakeNamedMaterial "mattePurple"
+        "string type" [ "matte" ]  #material type: matte
+	"rgb Kd" [ 0.7 0.5 0.7 ]         #Purple
+
+## Light ##################################################################################################################################
+AttributeBegin
+  Rotate 180 0 0 1
+  Translate 0 0 -50
+  #LightSource "infinite"  "string mapname" ["textures/doge2_latlong.exr"] 
+  LightSource "infinite"  "string mapname" ["images/background1.exr"] 
+AttributeEnd
+
+#R0010063.jpg
+################################
+#SPHERE 1:
+################################
+# AttributeBegin
+#   #NamedMaterial "Ruby"
+#   NamedMaterial "Mirror1"
+#   Translate 0 0 -50
+#   Shape "sphere" "float radius" 10 #sphere in the origin
+# AttributeEnd
+
+# V2 Objects
+
+#Helmet Object
+AttributeBegin
+  Translate 60 0 -15
+  Scale 1 1 1
+  #Rotate 0 0 0 1
+  #Rotate 180 0 1 0
+  Rotate 180 0 0 1
+  Rotate 0 1 0 0
+  #NamedMaterial "Mirror1"
+  #NamedMaterial "Glass1"
+  NamedMaterial "GlassMirror"
+  Include "geometry/visorOnlyV2.pbrt"
+AttributeEnd
+
+#Helmet Object 2
+# Kind of Works for now
+# AttributeBegin
+#   Translate 60 0 -15
+#   Scale 1 1 1
+#   #Rotate 0 0 0 1
+#   #Rotate 180 0 1 0
+#   Rotate 180 0 0 1
+#   Rotate 0 1 0 0
+#   #NamedMaterial "mattePurple"
+#   #NamedMaterial "Uber1"
+#   #NamedMaterial "Uber2"
+#   Material "uber" "texture Kd" "SP_LUK-scale" "color opacity" [1.000000 1.000000 1.000000] "color Ks" [0.000000 0.000000 0.000000] "float roughness" [0.500000] 
+#    "texture bumpmap" "SP_LUK-bump-scale"
+#   Include "geometry/bikeHelmetOnlyV2.pbrt"
+# AttributeEnd
+
+AttributeBegin
+  Translate 60 0 -15
+  Scale 1 1 1
+  #Rotate 0 0 0 1
+  #Rotate 180 0 1 0
+  Rotate 180 0 0 1
+  Rotate 0 1 0 0
+  #NamedMaterial "mattePurple"
+  #NamedMaterial "Uber1"
+  #NamedMaterial "Uber2"
+  #NamedMaterial "mitra_inlay"
+  NamedMaterial "bumpy_inlay"
+  Include "geometry/bikeHelmetOnlyV2.pbrt"
+AttributeEnd
+
+## v1 Objects
+
+# #Helmet Object
+# AttributeBegin
+#   Translate 40 -14 -8
+#   Scale 1 1 1
+#   #Rotate 0 0 0 1
+#   #Rotate 180 0 1 0
+#   Rotate 0 0 0 1
+#   Rotate 90 1 0 0
+#   Rotate -20 0 0 1
+#   NamedMaterial "Mirror1"
+#   Include "visorOnly.pbrt"
+# AttributeEnd
+
+# #Helmet Object 2
+# AttributeBegin
+#   Translate 62 -5 -15
+#   Scale 1 1 1
+#   #Rotate 0 0 0 1
+#   #Rotate 180 0 1 0
+#   Rotate 0 0 0 1
+#   Rotate 90 1 0 0
+#   Rotate -20 0 0 1
+#   NamedMaterial "mattePurple"
+#   Include "bikeHelmetOnly.pbrt"
+# AttributeEnd
+
+#Helmet Object 2
+# AttributeBegin
+#   Translate 0 -40 0
+#   Scale 1.5 1.5 1.5
+#   Rotate 0 0 0 1
+#   Rotate 180 0 1 0
+#   Rotate 0 1 0 0
+#   NamedMaterial "mattePurple"
+#   Include "helmet_v01_l3.pbrt"
+# AttributeEnd
+
+WorldEnd
