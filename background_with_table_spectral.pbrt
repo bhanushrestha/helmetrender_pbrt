@@ -1,0 +1,113 @@
+LookAt 100 0 0   0 0 0    0 0 1
+
+Camera "perspective" "float fov" [90]
+ 
+Film "image" "integer xresolution" [1000] "integer yresolution" [500]
+     "string filename" "cglab/cgproject/backgroundtablespectral.png"
+
+Sampler "halton" "integer pixelsamples" [12] #[128]
+
+Integrator "path"   "integer maxdepth" [10]
+
+WorldBegin
+## Mirror Material
+MakeNamedMaterial "Mirror1"
+	"color Kr" [0.7 0.7 0.7]
+	"string type" ["mirror"]
+  
+  MakeNamedMaterial "Mirror2"
+	"color Kr" [0.7 0.7 0.7]
+  "float eta" [2] 
+	"string type" ["glass"]
+  
+  # MakeNamedMaterial "Mirror3"
+	# "color Kr" [0.5]
+  # "spectrum amount" [0.1]
+  # "string namedmaterial1" ["Mirror1"]
+	# "string namedmaterial2" ["Mirror2"]
+  # "string type" ["mix"] 
+
+  
+## Matte Green
+MakeNamedMaterial "mattePurple"
+    "string type" [ "uber" ]  #material type: matte
+    "float eta" [15]    
+    "color Kd" [.1 .1 .1 ] "color Ks" [.7 .7 .7]
+    "float roughness" [.9]
+
+## Light ##################################################################################################################################
+AttributeBegin
+  Rotate 180 0 0 1
+  Translate 0 0 -50
+  LightSource "infinite"  "string mapname" ["images/R0010072.png"]
+AttributeEnd
+
+#Helmet Object
+AttributeBegin
+  Translate 60 0 -18
+  Scale 1 1 1
+  #Rotate 0 0 0 1
+  #Rotate 180 0 1 0
+  Rotate 180 0 0 1
+  Rotate 0 1 0 0
+  NamedMaterial "Mirror2"
+  Include "geometry/visorOnlyV2.pbrt"
+AttributeEnd
+
+#Helmet Object 2
+AttributeBegin
+  Translate 60 0 -18
+  Scale 1 1 1
+  #Rotate 0 0 0 1
+  #Rotate 180 0 1 0
+  Rotate 180 0 0 1
+  Rotate 0 1 0 0
+  NamedMaterial "mattePurple"
+  Include "geometry/bikeHelmetOnlyV2.pbrt"
+AttributeEnd
+
+# # Disk
+# AttributeBegin
+# Translate 42 0 -15
+# Texture "wood" "color" "imagemap" "string filename" "textures/American_walnut_pxr128.png"
+# Material "matte" "texture Kd" "wood"
+# Shape "disk" "float radius" [42.5] "float innerradius" [2.9] "float height" [0.6] "float phimax" [360]
+# Shape "cylinder" "float radius" [42.5] "float zmin" [-0.1] "float innerradius" [2.9] "float height" [0.6] "float phimax" [360]
+# AttributeEnd
+
+# Disk
+AttributeBegin
+Translate 42 0 -15
+# Texture "wood" "color" "imagemap" "string filename" "textures/American_walnut_pxr128.png"
+# Material "matte" "texture Kd" "wood"
+
+# Texture "checks" "spectrum" "checkerboard"
+#          "float uscale" [8] "float vscale" [8]
+#          "rgb tex1" [.1 .1 .1] "rgb tex2" [.8 .8 .8]
+# Material "matte" "texture Kd" "checks"
+
+# Material "glass" "float eta" [3] 
+# Material "glass" "float eta" [2]
+# Material "glass" "float eta" [1]  
+Material "glass" "float eta" [0] 
+
+# Material "glass" "float eta" [0.1] "float vroughness" [.01]
+
+# Material "glass" "float eta" [0.5] "float vroughness" [1]
+# Material "glass" "float eta" [0.5] "float uroughness" [1]
+
+# Material "metal" "float roughness" [0.001]
+# Material "metal" "float roughness" [0.1]
+# Material "metal" "float roughness" [0.99]
+
+Shape "disk" "float radius" [42.5] "float innerradius" [2.9] "float height" [0.6] "float phimax" [360]
+Shape "cylinder" "float radius" [42.5] "float zmin" [-0.1]  "float phimax" [360]
+AttributeEnd
+
+# Cylinder
+AttributeBegin
+Translate 42 0 -52
+Material "matte" "rgb Kd" [ 0.06 0.06 0.06 ] #Black
+Shape "cylinder" "float radius" [9.5] "float zmin" [-1] "float zmax" [42] "float phimax" [360]
+AttributeEnd
+WorldEnd
