@@ -3,7 +3,7 @@ LookAt 100 0 0   0 0 0    0 0 1
 Camera "perspective" "float fov" [90]
  
 Film "image" "integer xresolution" [1000] "integer yresolution" [500]
-     "string filename" "cglab/cgproject/backgroundtablespectral.png"
+     "string filename" "backgroundtablespectral.png"
 
 Sampler "halton" "integer pixelsamples" [12] #[128]
 

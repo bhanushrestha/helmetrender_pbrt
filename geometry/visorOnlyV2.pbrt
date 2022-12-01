@@ -3,7 +3,7 @@
 
 # Name "10517_Motorcycle_Helmet_v01_L3"
 AttributeBegin
-NamedMaterial "10517_Motorcycle_Helmet_v01_glass"
+#NamedMaterial "10517_Motorcycle_Helmet_v01_glass"
 Shape "trianglemesh"
   "point3 P" [ 
 	-19.60169983 -1.999999995e-06 12.41090012
