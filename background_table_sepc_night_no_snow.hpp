@@ -10,7 +10,7 @@
 #include "core/pbrt.h"
 #include "utility.hpp"
 
-void create_background(const ParamExperiment& param) {
+void create_no_snow_night(const ParamExperiment& param) {
     pbrt::pbrtInit(param.opt);
     pbrt::pbrtLookAt(/*E*/ param.lookAtE[0], param.lookAtE[1], param.lookAtE[2], /*L*/ 0, 0, 0, /*U*/ 0, 0, 1);
 
@@ -146,8 +146,8 @@ void create_background(const ParamExperiment& param) {
     pbrt::pbrtAttributeBegin();
     {
         Transformation transformations;
-        transformations.Rotate    = pbrt::Vector3f{0, 0, 1};
-        transformations.Deg       = 180;
+        transformations.Rotate = pbrt::Vector3f{0, 0, 1};
+        // transformations.Deg       = 180;
         transformations.Translate = pbrt::Vector3f{0, 0, -50};
         doTransformation(transformations);
 

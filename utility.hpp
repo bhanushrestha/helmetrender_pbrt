@@ -2,6 +2,9 @@
 
 #include "core/api.h"
 #include "core/paramset.h"
+#include <filesystem>
+
+#include "constants.hpp"
 
 using namespace std::string_literals;
 
@@ -21,6 +24,27 @@ std::unique_ptr<T[]> makeMulti(std::vector<T> vals) {
     }
     return std::move(ptr);
 }
+
+struct ParamExperiment {
+    pbrt::Options opt;
+    pbrt::Float fov                = pbrt::Float(FOV);
+    int width                      = XRES;
+    int height                     = YRES;
+    int rays                       = RAYS;
+    int ray_depth                  = RAY_DEPTH;
+    pbrt::Float glassetaF          = 0;
+    pbrt::Float visoretaF          = 0;
+    pbrt::Float kd[3]              = {0.f, 0.f, 0.f};
+    pbrt::Float kr[3]              = {1.0f, 1.0f, 1.0f};
+    pbrt::Float ks[3]              = {0.6f, 0.6f, 0.6f};
+    pbrt::Float lookAtE[3]         = {100.f, 0.f, 0.f};
+    pbrt::Float light_intensity[3] = {4.f, 4.f, 4.f};
+    pbrt::Float visor_roughness    = 0.07f;
+    pbrt::Float uroughness         = 0.0f;
+    pbrt::Float vroughness         = 0.0f;
+    std::string background_image;
+    std::string output_name;
+};
 
 void add_material(const std::string name, const std::string& filename) {
     // Autumn Leaves Materials
@@ -70,8 +94,14 @@ void add_attribute(const Transformation& transformation, const std::string& mate
         pbrt::pbrtNamedMaterial(material);
     }
 
-    pbrt::pbrtParseFile(include);
+    // Hack around a stupid around
+    auto path     = std::filesystem::current_path();
+    auto inc_path = std::filesystem::path(include);
+    std::filesystem::current_path(inc_path.parent_path());
 
+    pbrt::pbrtParseFile(inc_path.filename().string());
+
+    std::filesystem::current_path(path);
     pbrt::pbrtAttributeEnd();
 }
 

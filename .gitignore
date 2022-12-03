@@ -3,6 +3,7 @@ build/
 compile_commands.json
 *.png
 output.txt
+images/360Images/
 
 # vscode
 .vscode/

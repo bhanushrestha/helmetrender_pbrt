@@ -10,7 +10,7 @@
 #include "core/pbrt.h"
 #include "utility.hpp"
 
-void create_background(const ParamExperiment& param) {
+void create_day(const ParamExperiment& param) {
     pbrt::pbrtInit(param.opt);
     pbrt::pbrtLookAt(/*E*/ param.lookAtE[0], param.lookAtE[1], param.lookAtE[2], /*L*/ 0, 0, 0, /*U*/ 0, 0, 1);
 
@@ -92,6 +92,7 @@ void create_background(const ParamExperiment& param) {
     pbrt::pbrtAttributeEnd();
     pbrt::ParamSet mirrorMat;
     mirrorMat.AddRGBSpectrum("Kr", makeMulti(std::vector<pbrt::Float>{0.73565960f, 0.73565960f, 0.73565960f}), 3);
+    mirrorMat.AddRGBSpectrum("Kr", makeMulti(std::vector<pbrt::Float>{0.73565960f, 0.73565960f, 0.73565960f}), 3);
     mirrorMat.AddString("type", makeSingle("mirror"s), 1);
     pbrt::pbrtMakeNamedMaterial("Mirror1", mirrorMat);
 
@@ -143,6 +144,13 @@ void create_background(const ParamExperiment& param) {
     substrateMat2.AddRGBSpectrum("Ks", makeMulti(std::vector<pbrt::Float>{0.7f, 0.7f, 0.7f}), 3); // 0 to 1, 0.05
     pbrt::pbrtMakeNamedMaterial("substrateMat2", substrateMat2);
 
+    pbrt::ParamSet plasticMat;
+    plasticMat.AddString("type", makeSingle("plastic"s), 1);
+    plasticMat.AddTexture("Kd", "tmap");
+    plasticMat.AddFloat("roughness", makeSingle(pbrt::Float(0.01f))); // roughness from 0 to 1, 0.05
+    substrateMat2.AddRGBSpectrum("Ks", makeMulti(std::vector<pbrt::Float>{0.01f, 0.01f, 0.01f}), 3); // 0 to 1, 0.05
+    pbrt::pbrtMakeNamedMaterial("plasticMat", plasticMat);
+
     pbrt::pbrtAttributeBegin();
     {
         Transformation transformations;
@@ -153,22 +161,24 @@ void create_background(const ParamExperiment& param) {
 
         pbrt::ParamSet lightSrc;
         // TODO: The image?
+        std::cout << param.background_image << "\n";
         lightSrc.AddString("mapname", makeSingle(param.background_image), 1);
         pbrt::pbrtLightSource("infinite", lightSrc);
     }
     pbrt::pbrtAttributeEnd();
     // Add mirror visor
-    Transformation mirrorVisorTrans{{60, 0, -18}, {1, 1, 1}, 180, {0, 0, 1}};
+    Transformation mirrorVisorTrans{{10, 0, -18}, {1, 1, 1}, 180, {0, 0, 1}};
     add_attribute(mirrorVisorTrans, "mattePurple", "geometry/visorOnlyV2.pbrt");
     // add_attribute(mirrorVisorTrans, "substrateMat2", "geometry/visorOnlyV2.pbrt");
     //  Helmet Object 2
-    Transformation mattePurpleVisorTrans{{60, 0, -18}, {1, 1, 1}, 180, {0, 0, 1}};
-    add_attribute(mattePurpleVisorTrans, "substrateMat", "geometry/bikeHelmetOnlyV2.pbrt");
+    Transformation mattePurpleVisorTrans{{10, 0, -18}, {1, 1, 1}, 180, {0, 0, 1}};
+    // add_attribute(mattePurpleVisorTrans, "substrateMat", "geometry/bikeHelmetOnlyV2.pbrt");
+    add_attribute(mattePurpleVisorTrans, "plasticMat", "geometry/bikeHelmetOnlyV2.pbrt");
 
     // Disk
     pbrt::pbrtAttributeBegin();
     {
-        Transformation Trans{{42, 0, -15}};
+        Transformation Trans{{0, 0, -15}};
         doTransformation(Trans);
         pbrt::ParamSet diskMatPara;
         diskMatPara.AddFloat("eta", makeSingle(param.glassetaF)); // This
@@ -197,7 +207,7 @@ void create_background(const ParamExperiment& param) {
     // Cylinder
     pbrt::pbrtAttributeBegin();
     {
-        Transformation Trans{{42, 0, -52}};
+        Transformation Trans{{0, 0, -52}};
         doTransformation(Trans);
 
         pbrt::ParamSet cylMatPara;
