@@ -25,6 +25,24 @@ std::unique_ptr<T[]> makeMulti(std::vector<T> vals) {
     return std::move(ptr);
 }
 
+struct Transformation {
+    pbrt::Vector3f Translate{0, 0, 0};
+    pbrt::Vector3f Scale{1, 1, 1};
+
+    pbrt::Float Deg = 0.0;
+    pbrt::Vector3f Rotate{0, 0, 1};
+
+    std::string to_string() const {
+        std::stringstream ss;
+        ss << "Translate " << Translate.x << " " << Translate.y << " " << Translate.z << std::endl;
+        ss << "Scale " << Scale.x << " " << Scale.y << " " << Scale.z << std::endl;
+        ss << "Rotate " << Deg << " " << Rotate.x << " " << Rotate.y << " " << Rotate.z << std::endl;
+        return ss.str();
+    }
+
+    void print() const { std::cout << to_string(); }
+};
+
 struct ParamExperiment {
     pbrt::Options opt;
     pbrt::Float fov                = pbrt::Float(FOV);
@@ -42,7 +60,9 @@ struct ParamExperiment {
     pbrt::Float visor_roughness    = 0.07f;
     pbrt::Float uroughness         = 0.0f;
     pbrt::Float vroughness         = 0.0f;
+    std::string helmet_texture     = "images/2.png";
     std::string background_image;
+    Transformation bg_transform{};
     std::string output_name;
 };
 
@@ -58,24 +78,6 @@ void add_material(const std::string name, const std::string& filename) {
     MaterialParam.AddTexture("Kd", name);
     pbrt::pbrtMakeNamedMaterial(name, MaterialParam);
 }
-
-struct Transformation {
-    pbrt::Vector3f Translate{0, 0, 0};
-    pbrt::Vector3f Scale{1, 1, 1};
-
-    pbrt::Float Deg = 0.0;
-    pbrt::Vector3f Rotate{1, 0, 0};
-
-    std::string to_string() const {
-        std::stringstream ss;
-        ss << "Translate " << Translate.x << " " << Translate.y << " " << Translate.z << std::endl;
-        ss << "Scale " << Scale.x << " " << Scale.y << " " << Scale.z << std::endl;
-        ss << "Rotate " << Deg << " " << Rotate.x << " " << Rotate.y << " " << Rotate.z << std::endl;
-        return ss.str();
-    }
-
-    void print() const { std::cout << to_string(); }
-};
 
 void doTransformation(const Transformation& transformation) {
     pbrt::pbrtTranslate(transformation.Translate.x, transformation.Translate.y, transformation.Translate.z);

@@ -10,15 +10,15 @@
 #include "core/pbrt.h"
 #include "utility.hpp"
 
-void create_no_snow_night(const ParamExperiment& param) {
+void create_render(const ParamExperiment& param) {
     pbrt::pbrtInit(param.opt);
     pbrt::pbrtLookAt(/*E*/ param.lookAtE[0], param.lookAtE[1], param.lookAtE[2], /*L*/ 0, 0, 0, /*U*/ 0, 0, 1);
 
     // ***** Camera *****
     pbrt::ParamSet cameraParams;
     cameraParams.AddFloat("fov", makeSingle(pbrt::Float(param.fov)), 1);
-    cameraParams.AddFloat("lensradius", makeSingle(pbrt::Float(0.5f)), 1);
-    cameraParams.AddFloat("focaldistance", makeSingle(pbrt::Float(40.f)), 1);
+    cameraParams.AddFloat("lensradius", makeSingle(pbrt::Float(0.2f)), 1);
+    cameraParams.AddFloat("focaldistance", makeSingle(pbrt::Float(30.f)), 1);
 
     pbrt::pbrtCamera("perspective", cameraParams);
 
@@ -46,41 +46,9 @@ void create_no_snow_night(const ParamExperiment& param) {
     // ***** World Begins ******
     pbrt::pbrtWorldBegin();
 
-    // Main Light
-
-    // pbrt::pbrtAttributeBegin();
-    //{
-    //     pbrt::ParamSet arealightParam;
-    //     arealightParam.AddRGBSpectrum("L", makeMulti(std::vector<pbrt::Float>{45.f, 0, 0}), 3);
-    //     pbrt::pbrtAreaLightSource("area", arealightParam);
-    //
-    //    pbrt::pbrtCoordSysTransform("camera");
-    //    doTransformation(Transformation{{50, 50, 0}});
-    //    pbrt::ParamSet radius;
-    //    radius.AddFloat("radius", makeSingle(pbrt::Float(26)));
-    //    pbrt::pbrtShape("disk", radius);
-    //}
-    // pbrt::pbrtAttributeEnd();
-    /*
-
- #LightSource "distant" "color L" [50 50 50] "point from" [100 10 50] "point to" [0 0 1]
- #LightSource "distant" "color I" [30 30 30] "point from" [50 10 10]
-
- {
-    #LightSource "point" "color I" [30 30 30] "point from" [50 10 10]
-    pbrt::ParamSet lightSrc;
-    lightSrc.AddRGBSpectrum("I", makeMulti(std::vector<pbrt::Float>{30.0f, 30.0f, 30.0f}), 3);
-    lightSrc.AddPoint3f("from", makeSingle(pbrt::Point3f(50.f, 10.0, 10.0)), 1);
-    pbrt::pbrtLightSource("distant", lightSrc);
-
- }
-*/
-
     pbrt::pbrtAttributeBegin();
     {
         pbrt::ParamSet lightSrc;
-        // TODO: The image?
-        // lightSrc.AddString("", makeSingle(param.background_image), 1);
         lightSrc.AddRGBSpectrum(
             "L",
             makeMulti(std::vector<pbrt::Float>{param.light_intensity[0], param.light_intensity[1], param.light_intensity[2]}),
@@ -119,7 +87,7 @@ void create_no_snow_night(const ParamExperiment& param) {
 
     // Substrate Texture and Material
     pbrt::ParamSet tmap;
-    tmap.AddString("filename", makeSingle("textures/bump.png"s), 1);
+    tmap.AddString("filename", makeSingle(param.helmet_texture), 1);
     pbrt::pbrtTexture("tmap", "color", "imagemap", tmap);
 
     pbrt::ParamSet substrateMat;
@@ -143,16 +111,17 @@ void create_no_snow_night(const ParamExperiment& param) {
     substrateMat2.AddRGBSpectrum("Ks", makeMulti(std::vector<pbrt::Float>{0.7f, 0.7f, 0.7f}), 3); // 0 to 1, 0.05
     pbrt::pbrtMakeNamedMaterial("substrateMat2", substrateMat2);
 
+    pbrt::ParamSet plasticMat;
+    plasticMat.AddString("type", makeSingle("plastic"s), 1);
+    plasticMat.AddTexture("Kd", "tmap");
+    plasticMat.AddFloat("roughness", makeSingle(pbrt::Float(0.01f))); // roughness from 0 to 1, 0.05
+    substrateMat2.AddRGBSpectrum("Ks", makeMulti(std::vector<pbrt::Float>{0.01f, 0.01f, 0.01f}), 3); // 0 to 1, 0.05
+    pbrt::pbrtMakeNamedMaterial("plasticMat", plasticMat);
+
     pbrt::pbrtAttributeBegin();
     {
-        Transformation transformations;
-        transformations.Rotate = pbrt::Vector3f{0, 0, 1};
-        // transformations.Deg       = 180;
-        transformations.Translate = pbrt::Vector3f{0, 0, -50};
-        doTransformation(transformations);
-
+        doTransformation(param.bg_transform);
         pbrt::ParamSet lightSrc;
-        // TODO: The image?
         lightSrc.AddString("mapname", makeSingle(param.background_image), 1);
         pbrt::pbrtLightSource("infinite", lightSrc);
     }
@@ -163,7 +132,8 @@ void create_no_snow_night(const ParamExperiment& param) {
     // add_attribute(mirrorVisorTrans, "substrateMat2", "geometry/visorOnlyV2.pbrt");
     //  Helmet Object 2
     Transformation mattePurpleVisorTrans{{10, 0, -18}, {1, 1, 1}, 180, {0, 0, 1}};
-    add_attribute(mattePurpleVisorTrans, "substrateMat", "geometry/bikeHelmetOnlyV2.pbrt");
+    // add_attribute(mattePurpleVisorTrans, "substrateMat", "geometry/bikeHelmetOnlyV2.pbrt");
+    add_attribute(mattePurpleVisorTrans, "plasticMat", "geometry/bikeHelmetOnlyV2.pbrt");
 
     // Disk
     pbrt::pbrtAttributeBegin();
@@ -172,8 +142,11 @@ void create_no_snow_night(const ParamExperiment& param) {
         doTransformation(Trans);
         pbrt::ParamSet diskMatPara;
         diskMatPara.AddFloat("eta", makeSingle(param.glassetaF)); // This
+
         // Adding the glossiness to the glass
-        diskMatPara.AddFloat("Kr", makeSingle(pbrt::Float(10.0f)));
+        // diskMatPara.AddFloat("Kr", makeSingle(pbrt::Float(10.0f)));
+        // diskMatPara.AddFloat("Kt", makeSingle(pbrt::Float(10.0f)));
+        diskMatPara.AddFloat("Kr", makeSingle(pbrt::Float(.1f)));
         diskMatPara.AddFloat("Kt", makeSingle(pbrt::Float(10.0f)));
 
         // Selecting material type for the disk
