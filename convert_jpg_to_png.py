@@ -5,7 +5,11 @@ from PIL import Image
 
 
 def convert_image(path_loc, filename):
-    if not filename.endswith(".jpg") and not filename.endswith(".JPG"):
+    if (
+        not filename.endswith(".jpg")
+        and not filename.endswith(".JPG")
+        and not filename.endswith(".jpeg")
+    ):
         return
     image_path = os.path.join(path_loc, os.path.splitext(filename)[0] + ".png")
     if os.path.exists(image_path):
@@ -19,15 +23,31 @@ def convert_image(path_loc, filename):
     )
 
 
-def convert_image_r(input_folder):
+def resize_image(path_loc, filename):
+    if not filename.endswith(".png") and not filename.endswith(".JPG"):
+        return
+    image_path = os.path.join(path_loc, os.path.splitext(filename)[0] + "_resize.png")
+    if os.path.exists(image_path):
+        return
+
+    current_img = Image.open(os.path.join(path_loc, filename))
+    print("saving to", image_path)
+    current_img = current_img.resize((current_img.width // 2, current_img.height // 2))
+    current_img.save(
+        image_path,
+        "PNG",
+    )
+
+
+def cmd_image_r(input_folder, func):
     for filename in os.listdir(input_folder):
         folder = os.path.join(input_folder, filename)
         if os.path.isdir(folder):
             print("is directory", filename)
-            convert_image_r(folder)
+            cmd_image_r(folder)
         else:
             print(filename)
-            convert_image(input_folder, filename)
+            func(input_folder, filename)
 
 
 def create_gif(folder, gif_img):
@@ -56,9 +76,15 @@ cmd = sys.argv[1]
 input_path = sys.argv[2]
 if cmd == "convert":
     if os.path.isdir(input_path):
-        convert_image_r(input_path)
+        cmd_image_r(input_path, convert_image)
     else:
         convert_image(os.path.dirname(input_path), os.path.basename(input_path))
+
+if cmd == "resize":
+    if os.path.isdir(input_path):
+        cmd_image_r(input_path, resize_image)
+    else:
+        resize_image(os.path.dirname(input_path), os.path.basename(input_path))
 
 elif cmd == "gif":
     gif_img = sys.argv[3]
