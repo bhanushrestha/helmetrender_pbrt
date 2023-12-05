@@ -17,8 +17,9 @@ void create_render(const ParamExperiment& param) {
     // ***** Camera *****
     pbrt::ParamSet cameraParams;
     cameraParams.AddFloat("fov", makeSingle(pbrt::Float(param.fov)), 1);
-    cameraParams.AddFloat("lensradius", makeSingle(pbrt::Float(0.2f)), 1);
-    cameraParams.AddFloat("focaldistance", makeSingle(pbrt::Float(30.f)), 1);
+    // Focus
+    // cameraParams.AddFloat("lensradius", makeSingle(pbrt::Float(0.2f)), 1);
+    // cameraParams.AddFloat("focaldistance", makeSingle(pbrt::Float(0.f)), 1);
 
     pbrt::pbrtCamera("perspective", cameraParams);
 
@@ -29,7 +30,7 @@ void create_render(const ParamExperiment& param) {
     // yresolution
     filmParams.AddInt("yresolution", makeSingle(param.height), 1);
     // filename
-    filmParams.AddString("filename", makeSingle(std::string(param.output_name)), 1);
+    filmParams.AddString("filename", makeSingle(param.output_name), 1);
 
     pbrt::pbrtFilm("image", filmParams);
 
@@ -58,96 +59,125 @@ void create_render(const ParamExperiment& param) {
         pbrt::pbrtLightSource("distant", lightSrc);
     }
     pbrt::pbrtAttributeEnd();
-    pbrt::ParamSet mirrorMat;
-    mirrorMat.AddRGBSpectrum("Kr", makeMulti(std::vector<pbrt::Float>{0.73565960f, 0.73565960f, 0.73565960f}), 3);
-    mirrorMat.AddString("type", makeSingle("mirror"s), 1);
-    pbrt::pbrtMakeNamedMaterial("Mirror1", mirrorMat);
+    /*
 
-    pbrt::ParamSet mirror2Mat;
-    mirror2Mat.AddRGBSpectrum("Kd", makeMulti(std::vector<pbrt::Float>{0.7f, 0.7f, 0.7f}), 3);
-    mirror2Mat.AddFloat("eta", makeSingle(param.visoretaF)); // THIS one
-    mirror2Mat.AddString("type", makeSingle("glass"s), 1);
-    pbrt::pbrtMakeNamedMaterial("Mirror2", mirror2Mat);
 
-    // Uber material
-    pbrt::ParamSet purpleMat;
-    purpleMat.AddString("type", makeSingle("uber"s), 1);
-    mirror2Mat.AddFloat("eta", makeSingle(pbrt::Float(1.5)));
-    purpleMat.AddRGBSpectrum("Kd",
-                             makeMulti(std::vector<pbrt::Float>(param.kd, param.kd + sizeof(param.kd) / sizeof(param.kd[0]))),
-                             3);
-    purpleMat.AddRGBSpectrum("Ks",
-                             makeMulti(std::vector<pbrt::Float>(param.ks, param.ks + sizeof(param.ks) / sizeof(param.ks[0]))),
-                             3);
-    purpleMat.AddRGBSpectrum("Kr",
-                             makeMulti(std::vector<pbrt::Float>(param.kr, param.kr + sizeof(param.kr) / sizeof(param.kr[0]))),
-                             3);
-    purpleMat.AddFloat("roughness", makeSingle(param.visor_roughness));
-    pbrt::pbrtMakeNamedMaterial("mattePurple", purpleMat);
 
-    // Substrate Texture and Material
-    pbrt::ParamSet tmap;
-    tmap.AddString("filename", makeSingle(param.helmet_texture), 1);
-    pbrt::pbrtTexture("tmap", "color", "imagemap", tmap);
 
-    pbrt::ParamSet substrateMat;
-    substrateMat.AddString("type", makeSingle("substrate"s), 1);
-    substrateMat.AddTexture("Kd", "tmap");
-    // This actually worked before
-    //  substrateMat.AddRGBSpectrum("Ks", makeMulti(std::vector<pbrt::Float>{0.04f, 0.04f, 0.04f}), 3);
-    //  substrateMat.AddBool("remaproughness", makeSingle(false), 1);
-    substrateMat.AddRGBSpectrum("Ks", makeMulti(std::vector<pbrt::Float>{0.1f, 0.1f, 0.1f}), 3);
-    // substrateMat.AddFloat("uroughness", makeSingle(pbrt::Float(0.07f))); // roughness from 0 to 1, 0.05
-    // substrateMat.AddFloat("vroughness", makeSingle(pbrt::Float(0.07f))); // roughness from 0 to 1, 0.05
-    substrateMat.AddBool("remaproughness", makeSingle(false), 1);
-    pbrt::pbrtMakeNamedMaterial("substrateMat", substrateMat);
 
-    pbrt::ParamSet substrateMat2;
-    substrateMat2.AddString("type", makeSingle("substrate"s), 1);
-    // substrateMat2.AddTexture("Kd", "tmap");
-    substrateMat2.AddFloat("uroughness", makeSingle(pbrt::Float(0.0f))); // roughness from 0 to 1, 0.05
-    substrateMat2.AddFloat("vroughness", makeSingle(pbrt::Float(0.0f))); // roughness from 0 to 1, 0.05
-    substrateMat2.AddBool("remaproughness", makeSingle(false), 1);       // try with bot false and true for ^
-    substrateMat2.AddRGBSpectrum("Ks", makeMulti(std::vector<pbrt::Float>{0.7f, 0.7f, 0.7f}), 3); // 0 to 1, 0.05
-    pbrt::pbrtMakeNamedMaterial("substrateMat2", substrateMat2);
+    */
+    {
+        // The helmet material
+        pbrt::ParamSet helmetMaterial;
 
-    pbrt::ParamSet plasticMat;
-    plasticMat.AddString("type", makeSingle("plastic"s), 1);
-    plasticMat.AddTexture("Kd", "tmap");
-    plasticMat.AddFloat("roughness", makeSingle(pbrt::Float(0.01f))); // roughness from 0 to 1, 0.05
-    substrateMat2.AddRGBSpectrum("Ks", makeMulti(std::vector<pbrt::Float>{0.01f, 0.01f, 0.01f}), 3); // 0 to 1, 0.05
-    pbrt::pbrtMakeNamedMaterial("plasticMat", plasticMat);
+        pbrt::ParamSet coreMap;
+        coreMap.AddString("filename", makeSingle("textures/viking/1_Base_Color_resize.png"s), 1);
+        pbrt::pbrtTexture("1-coremap", "color", "imagemap", coreMap);
+        helmetMaterial.AddTexture("color", "1-coremap");
+
+        // Specular Reflection
+        // float kr = 0.8f;
+        // helmetMaterial.AddRGBSpectrum("Kr", makeMulti(std::vector<pbrt::Float>{kr, kr, kr}), 3);
+
+        // Glossyness
+        // float ks = 0.8f;
+        // helmetMaterial.AddRGBSpectrum("Ks", makeMulti(std::vector<pbrt::Float>{ks, ks, ks}), 3);
+
+        helmetMaterial.AddString("type", makeSingle("disney"s), 1);
+
+        // helmetMaterial.AddFloat("roughness", makeSingle(pbrt::Float(0.6f)));
+        helmetMaterial.AddFloat("eta", makeSingle(pbrt::Float(2.9304f)));
+
+        // pbrt::ParamSet bumpMap;
+        // bumpMap.AddString("filename", makeSingle("textures/viking/9425-bump.png"s), 1);
+        // pbrt::pbrtTexture("1-bmap", "float", "imagemap", bumpMap);
+        // helmetMaterial.AddTexture("bumpmap", "1-bmap");
+        //
+        //  pbrt::ParamSet roughMap;
+        //  roughMap.AddString("filename", makeSingle("textures/viking/1_Roughness_resize.png"s), 1);
+        //  pbrt::pbrtTexture("1-rough", "float", "imagemap", roughMap);
+        //  helmetMaterial.AddTexture("roughness", "1-rough");
+
+        helmetMaterial.AddFloat("metallic", makeSingle(pbrt::Float(1.f)));
+        // helmetMaterial.AddFloat("spectrans", makeSingle(pbrt::Float(0.8f)));
+        // helmetMaterial.AddFloat("speculartint", makeSingle(pbrt::Float(0.1f)));
+        helmetMaterial.AddFloat("roughness", makeSingle(pbrt::Float(0.1f)));
+
+        // float kd = 0.5f;
+        // float ks = 0.2f;
+        // float kr = 0.0331047662f;
+        // helmetMaterial.AddRGBSpectrum("Kd", makeMulti(std::vector<pbrt::Float>{kd, kd, kd}), 3);
+        // helmetMaterial.AddRGBSpectrum("Ks", makeMulti(std::vector<pbrt::Float>{ks, ks, ks}), 3);
+        // helmetMaterial.AddRGBSpectrum("Kr", makeMulti(std::vector<pbrt::Float>{kr, kr, kr}), 3);
+
+        // helmetMaterial.AddFloat("index", makeSingle(pbrt::Float(1.45f)), 1);
+        pbrt::pbrtMakeNamedMaterial("helmetMaterial", helmetMaterial);
+    }
+    {
+        // The chain material
+        pbrt::ParamSet chainMaterial;
+
+        pbrt::ParamSet coreMap2;
+        coreMap2.AddString("filename", makeSingle("textures/viking/2_Base_Color_resize.png"s), 1);
+        pbrt::pbrtTexture("2-coremap", "color", "imagemap", coreMap2);
+        chainMaterial.AddTexture("color", "2-coremap");
+
+        // pbrt::ParamSet roughMap2;
+        // roughMap2.AddString("filename", makeSingle("textures/viking/2_Roughness_resize.png"s),
+        // 1); pbrt::pbrtTexture("2-rough", "float", "imagemap", roughMap2);
+        // chainMaterial.AddTexture("roughness", "2-rough");
+
+        chainMaterial.AddString("type", makeSingle("disney"s), 1);
+        chainMaterial.AddFloat("metallic", makeSingle(pbrt::Float(1.f)));
+        chainMaterial.AddFloat("roughness", makeSingle(pbrt::Float(0.1f)));
+        chainMaterial.AddFloat("eta", makeSingle(pbrt::Float(2.9304f)), 1);
+
+        pbrt::pbrtMakeNamedMaterial("chainMaterial", chainMaterial);
+    }
+
+    {
+        // The mandy helmet material
+        pbrt::ParamSet mandyMaterial;
+
+        pbrt::ParamSet coreMap;
+        coreMap.AddString("filename", makeSingle("textures/mandy/lambert1_albedo_resize.png"s), 1);
+        pbrt::pbrtTexture("lambert1-kd", "color", "imagemap", coreMap);
+        mandyMaterial.AddTexture("color", "lambert1-kd");
+
+        mandyMaterial.AddString("type", makeSingle("disney"s), 1);
+
+        mandyMaterial.AddFloat("metallic", makeSingle(pbrt::Float(1.f)));
+        mandyMaterial.AddFloat("roughness", makeSingle(pbrt::Float(0.0f)));
+        mandyMaterial.AddFloat("speculartint", makeSingle(pbrt::Float(0.2f)));
+        mandyMaterial.AddFloat("eta", makeSingle(pbrt::Float(2.9304f)), 1);
+
+        pbrt::pbrtMakeNamedMaterial("lambert1", mandyMaterial);
+    }
 
     pbrt::pbrtAttributeBegin();
     {
-        doTransformation(param.bg_transform);
+        // doTransformation(param.bg_transform);
         pbrt::ParamSet lightSrc;
+        std::cout << "background image " << param.background_image << "!!!!!" << std::endl;
         lightSrc.AddString("mapname", makeSingle(param.background_image), 1);
         pbrt::pbrtLightSource("infinite", lightSrc);
     }
     pbrt::pbrtAttributeEnd();
-    // Add mirror visor
-    Transformation mirrorVisorTrans{{10, 0, -18}, {1, 1, 1}, 180, {0, 0, 1}};
-    add_attribute(mirrorVisorTrans, "mattePurple", "geometry/visorOnlyV2.pbrt");
-    // add_attribute(mirrorVisorTrans, "substrateMat2", "geometry/visorOnlyV2.pbrt");
-    //  Helmet Object 2
-    Transformation mattePurpleVisorTrans{{10, 0, -18}, {1, 1, 1}, 180, {0, 0, 1}};
-    // add_attribute(mattePurpleVisorTrans, "substrateMat", "geometry/bikeHelmetOnlyV2.pbrt");
-    add_attribute(mattePurpleVisorTrans, "plasticMat", "geometry/bikeHelmetOnlyV2.pbrt");
+    Transformation HelemtTransformation{{10, 0, -5}, {15, 15, 15}, 120, {0.5773503f, 0.5773503f, 0.5773503f}};
+    add_attribute2(HelemtTransformation, "geometry/viking_helmet.pbrt");
+
+    // Uncomment to use the Mandelorian Helmet
+    // Transformation MandyTransformation{{10, 0, 3}, {110, 110, 110}, 120, {0.5773503f, 0.5773503f, 0.5773503f}};
+    // add_attribute2(MandyTransformation, "geometry/mandy_helmet.pbrt");
 
     // Disk
+
     pbrt::pbrtAttributeBegin();
     {
         Transformation Trans{{0, 0, -15}};
         doTransformation(Trans);
         pbrt::ParamSet diskMatPara;
         diskMatPara.AddFloat("eta", makeSingle(param.glassetaF)); // This
-
-        // Adding the glossiness to the glass
-        // diskMatPara.AddFloat("Kr", makeSingle(pbrt::Float(10.0f)));
-        // diskMatPara.AddFloat("Kt", makeSingle(pbrt::Float(10.0f)));
-        diskMatPara.AddFloat("Kr", makeSingle(pbrt::Float(.1f)));
-        diskMatPara.AddFloat("Kt", makeSingle(pbrt::Float(10.0f)));
 
         // Selecting material type for the disk
         pbrt::pbrtMaterial("glass", diskMatPara);
@@ -168,9 +198,10 @@ void create_render(const ParamExperiment& param) {
     pbrt::pbrtAttributeEnd();
 
     // Cylinder
+
     pbrt::pbrtAttributeBegin();
     {
-        Transformation Trans{{0, 0, -52}};
+        Transformation Trans{{0, 0, -57}};
         doTransformation(Trans);
 
         pbrt::ParamSet cylMatPara;
@@ -185,6 +216,7 @@ void create_render(const ParamExperiment& param) {
         pbrt::pbrtShape("cylinder", cylShapePara);
     }
     pbrt::pbrtAttributeEnd();
+
     pbrt::pbrtWorldEnd();
     pbrt::pbrtCleanup();
 }

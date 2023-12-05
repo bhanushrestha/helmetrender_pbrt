@@ -3,6 +3,7 @@
 #include "core/api.h"
 #include "core/paramset.h"
 #include <filesystem>
+#include <ostream>
 
 #include "constants.hpp"
 
@@ -45,28 +46,26 @@ struct Transformation {
 
 struct ParamExperiment {
     pbrt::Options opt;
-    pbrt::Float fov                = pbrt::Float(FOV);
-    int width                      = XRES;
-    int height                     = YRES;
-    int rays                       = RAYS;
-    int ray_depth                  = RAY_DEPTH;
-    pbrt::Float glassetaF          = 0;
-    pbrt::Float visoretaF          = 0;
-    pbrt::Float kd[3]              = {0.f, 0.f, 0.f};
-    pbrt::Float kr[3]              = {1.0f, 1.0f, 1.0f};
-    pbrt::Float ks[3]              = {0.6f, 0.6f, 0.6f};
-    pbrt::Float lookAtE[3]         = {100.f, 0.f, 0.f};
-    pbrt::Float light_intensity[3] = {4.f, 4.f, 4.f};
-    pbrt::Float visor_roughness    = 0.07f;
-    pbrt::Float uroughness         = 0.0f;
-    pbrt::Float vroughness         = 0.0f;
-    std::string helmet_texture     = "images/2.png";
+    pbrt::Float fov        = pbrt::Float(60);
+    int width              = XRES;
+    int height             = YRES;
+    int rays               = RAYS;
+    int ray_depth          = RAY_DEPTH;
+    pbrt::Float glassetaF  = 0;
+    pbrt::Float visoretaF  = 0;
+    pbrt::Float kd[3]      = {0.f, 0.f, 0.f};
+    pbrt::Float kr[3]      = {1.0f, 1.0f, 1.0f};
+    pbrt::Float ks[3]      = {0.6f, 0.6f, 0.6f};
+    pbrt::Float lookAtE[3] = {60.f, 0.f, 0.f};
+    // pbrt::Float lookAtE[3]         = {30.f, 10.f, 10.f};
+    pbrt::Float light_intensity[3] = {0.1f, 0.1f, 0.1f};
+    // std::string helmet_texture     = "images/2.png";
     std::string background_image;
     Transformation bg_transform{};
     std::string output_name;
 };
 
-void add_material(const std::string name, const std::string& filename) {
+void add_material(const std::string& name, const std::string& filename) {
     // Autumn Leaves Materials
     pbrt::ParamSet TextureParam;
     TextureParam.AddString("filename", makeSingle(filename), 1);
@@ -85,16 +84,49 @@ void doTransformation(const Transformation& transformation) {
     pbrt::pbrtRotate(transformation.Deg, transformation.Rotate.x, transformation.Rotate.y, transformation.Rotate.z);
 }
 
-void add_attribute(const Transformation& transformation, const std::string& material, const std::string& include = "") {
+bool hasEnding(std::string const& fullString, std::string const& ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
+    }
+    else {
+        return false;
+    }
+}
+
+void add_attribute(const Transformation& transformation,
+                   const std::string& material,
+                   const std::string& include = "",
+                   const bool named_mat       = false) {
     pbrt::pbrtAttributeBegin();
 
     doTransformation(transformation);
-    if (material == ".pbrt") {
+    if (hasEnding(material, ".pbrt")) {
         pbrt::pbrtParseFile(material);
     }
-    else {
+    else if (named_mat) {
         pbrt::pbrtNamedMaterial(material);
     }
+    else {
+        pbrt::ParamSet materialParam;
+        materialParam.AddRGBSpectrum("Kd", makeMulti(std::vector<pbrt::Float>{1.f, 1.f, 1.f}), 3);
+        pbrt::pbrtMaterial(material, materialParam);
+    }
+
+    // Hack around a stupid around
+    auto path     = std::filesystem::current_path();
+    auto inc_path = std::filesystem::path(include);
+    std::filesystem::current_path(inc_path.parent_path());
+
+    pbrt::pbrtParseFile(inc_path.filename().string());
+
+    std::filesystem::current_path(path);
+    pbrt::pbrtAttributeEnd();
+}
+
+void add_attribute2(const Transformation& transformation, const std::string& include = "") {
+    pbrt::pbrtAttributeBegin();
+
+    doTransformation(transformation);
 
     // Hack around a stupid around
     auto path     = std::filesystem::current_path();
@@ -112,12 +144,15 @@ void create_object(const std::string& name,
                    std::vector<Transformation> transformations,
                    std::vector<std::string> includes) {
     pbrt::pbrtObjectBegin(name);
-    if (materials.size() != transformations.size() && materials.size() != includes.size()) {
-        return;
+    if (materials.size() == transformations.size() && materials.size() == includes.size()) {
+        for (unsigned int i = 0; i < materials.size(); i++) {
+            add_attribute(transformations[i], materials[i], includes[i]);
+        }
     }
-    for (int i = 0; i < materials.size(); i++) {
-        add_attribute(transformations[i], materials[i], includes[i]);
+    else {
+        std::cout << "ERROR: " << materials.size() << "!= " << transformations.size() << "!= " << includes.size() << std::endl;
     }
+
     pbrt::pbrtObjectEnd();
 }
 
